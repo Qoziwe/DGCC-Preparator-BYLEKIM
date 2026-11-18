@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DGCC Ultimate Quiz Engine — Weeks 1 to 8 (EN / RU)</title>
+  <style>
+    :root {
+      --bg-main: #0b0f19;
+      --bg-card: #131b2e;
+      --bg-card-hover: #1a2540;
+      --bg-elevated: #1e293b;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --accent: #38bdf8;
+      --accent-hover: #0284c7;
+      --accent-soft: rgba(56, 189, 248, 0.14);
+      --border: #26334d;
+      --success: #22c55e;
+      --success-bg: rgba(34, 197, 94, 0.14);
+      --danger: #ef4444;
+      --danger-bg: rgba(239, 68, 68, 0.14);
+      --warning: #f59e0b;
+      --warning-bg: rgba(245, 158, 11, 0.14);
+      --purple: #a855f7;
+      --purple-bg: rgba(168, 85, 247, 0.14);
+      --radius: 14px;
+      --shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.5);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background-color: var(--bg-main);
+      background-image: 
+        radial-gradient(at 10% 10%, rgba(56, 189, 248, 0.08) 0px, transparent 50%),
+        radial-gradient(at 90% 90%, rgba(168, 85, 247, 0.08) 0px, transparent 50%);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+      padding-bottom: 60px;
+    }
+
+    /* Top Navigation Bar */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(11, 15, 25, 0.88);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 24px;
+    }
+
+    .topbar-inner {
+      max-width: 1180px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-badge {
+      background: linear-gradient(135deg, #38bdf8, #818cf8);
+      color: #0b0f19;
+      font-weight: 800;
+      font-size: 0.9rem;
+      padding: 6px 12px;
+      border-radius: 8px;
+      letter-spacing: 0.5px;
+    }
+
+    .brand-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .brand-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      display: block;
+    }
+
+    .topbar-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    /* Language Switcher */
+    .lang-switch {
+      display: inline-flex;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 4px;
+      gap: 4px;
+    }
+
+    .lang-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 6px 14px;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+
+    .lang-btn.active {
+      background: var(--accent);
+      color: #0b0f19;
+      box-shadow: 0 2px 10px rgba(56, 189, 248, 0.35);
+    }
+
+    .btn {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+      padding: 9px 16px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--accent);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #38bdf8, #0284c7);
+      color: #0b0f19;
+      border: none;
+      font-weight: 700;
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+
+    .btn-danger {
+      background: var(--danger-bg);
+      color: #fca5a5;
+      border-color: rgba(239, 68, 68, 0.4);
+    }
+
+    .btn-danger:hover {
+      background: rgba(239, 68, 68, 0.25);
+      border-color: var(--danger);
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 1180px;
+      margin: 28px auto 0;
+      padding: 0 20px;
+    }
+
+    /* Card Component */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 26px;
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .section-desc {
+      font-size: 0.92rem;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    /* Topic Selection Grid */
+    .topics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+
+    .topic-card {
+      background: var(--bg-elevated);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+      user-select: none;
+    }
+
+    .topic-card:hover {
+      border-color: rgba(56, 189, 248, 0.5);
+      transform: translateY(-2px);
+    }
+
+    .topic-card.selected {
+      background: rgba(56, 189, 248, 0.1);
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.25);
+    }
+
+    .topic-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .topic-badge {
+      font-size: 0.78rem;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      letter-spacing: 0.4px;
+    }
+
+    .topic-check {
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      border: 2px solid var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 900;
+      color: transparent;
+      transition: all 0.15s ease;
+    }
+
+    .topic-card.selected .topic-check {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #0b0f19;
+    }
+
+    .topic-name {
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--text-primary);
+    }
+
+    .topic-details {
+      font-size: 0.83rem;
+      color: var(--text-secondary);
+    }
+
+    .topic-stats {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+
+    .pill {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.14);
+      color: var(--text-secondary);
+    }
+
+    .pill-moodle {
+      background: var(--purple-bg);
+      color: #d8b4fe;
+    }
+
+    .pill-slides {
+      background: var(--warning-bg);
+      color: #fcd34d;
+    }
+
+    /* Settings & Toggles Row */
+    .settings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+    }
+
+    .setting-box {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .setting-label {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .setting-sub {
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+    }
+
+    .select-input {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 9px 12px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      width: 100%;
+      cursor: pointer;
+    }
+
+    /* Toggle Switch */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 4px;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 28px;
+      flex-shrink: 0;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background-color: #334155;
+      transition: 0.2s;
+      border-radius: 28px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: 0.2s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: var(--accent);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(22px);
+      background-color: #0b0f19;
+    }
+
+    /* Launch Bar */
+    .launch-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-top: 22px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .selected-summary {
+      font-size: 0.98rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .selected-summary strong {
+      color: var(--accent);
+      font-size: 1.15rem;
+    }
+
+    /* Quiz View */
+    .hidden {
+      display: none !important;
+    }
+
+    .quiz-layout {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 22px;
+      align-items: start;
+    }
+
+    @media (max-width: 920px) {
+      .quiz-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .progress-bar-wrap {
+      width: 100%;
+      height: 8px;
+      background: var(--bg-elevated);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-bottom: 18px;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #38bdf8, #818cf8);
+      transition: width 0.25s ease;
+    }
+
+    .question-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .meta-badges {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .q-counter {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-secondary);
+    }
+
+    .question-text {
+      font-size: 1.22rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 22px;
+      line-height: 1.5;
+    }
+
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .option-btn {
+      width: 100%;
+      text-align: left;
+      background: var(--bg-elevated);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 15px 18px;
+      color: var(--text-primary);
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.16s ease;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      line-height: 1.45;
+    }
+
+    .option-btn:hover:not(:disabled) {
+      border-color: var(--accent);
+      background: var(--bg-card-hover);
+    }
+
+    .option-letter {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: rgba(148, 163, 184, 0.15);
+      color: var(--text-secondary);
+      font-weight: 800;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .option-btn.selected {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .option-btn.selected .option-letter {
+      background: var(--accent);
+      color: #0b0f19;
+    }
+
+    .option-btn.correct {
+      border-color: var(--success);
+      background: var(--success-bg);
+    }
+
+    .option-btn.correct .option-letter {
+      background: var(--success);
+      color: #0b0f19;
+    }
+
+    .option-btn.wrong {
+      border-color: var(--danger);
+      background: var(--danger-bg);
+    }
+
+    .option-btn.wrong .option-letter {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    .option-btn:disabled {
+      cursor: default;
+    }
+
+    /* Explanation Box */
+    .explanation-box {
+      margin-top: 20px;
+      padding: 18px 20px;
+      border-radius: 12px;
+      border-left: 4px solid var(--accent);
+      background: rgba(30, 41, 59, 0.75);
+    }
+
+    .explanation-box.is-correct {
+      border-left-color: var(--success);
+      background: rgba(34, 197, 94, 0.08);
+    }
+
+    .explanation-box.is-wrong {
+      border-left-color: var(--danger);
+      background: rgba(239, 68, 68, 0.08);
+    }
+
+    .explanation-title {
+      font-weight: 800;
+      font-size: 0.95rem;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .explanation-text {
+      font-size: 0.95rem;
+      color: var(--text-primary);
+    }
+
+    .explanation-ref {
+      margin-top: 8px;
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      font-style: italic;
+    }
+
+    /* Navigation Footer inside Question Card */
+    .quiz-nav-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 24px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    /* Sidebar Question Map */
+    .q-map-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+      gap: 8px;
+      max-height: 420px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .q-map-btn {
+      height: 38px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg-elevated);
+      color: var(--text-secondary);
+      font-weight: 700;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .q-map-btn:hover {
+      border-color: var(--accent);
+      color: var(--text-primary);
+    }
+
+    .q-map-btn.current {
+      border: 2px solid var(--accent);
+      color: var(--accent);
+    }
+
+    .q-map-btn.answered-correct {
+      background: var(--success-bg);
+      border-color: var(--success);
+      color: #86efac;
+    }
+
+    .q-map-btn.answered-wrong {
+      background: var(--danger-bg);
+      border-color: var(--danger);
+      color: #fca5a5;
+    }
+
+    .q-map-btn.answered-exam {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .score-mini {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      margin-bottom: 14px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* Results Screen */
+    .results-hero {
+      text-align: center;
+      padding: 20px 10px 28px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 24px;
+    }
+
+    .results-score-big {
+      font-size: 3.2rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #38bdf8, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1.1;
+      margin: 10px 0;
+    }
+
+    .review-list {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .review-item {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px;
+    }
+
+    .review-item.correct-item {
+      border-left: 4px solid var(--success);
+    }
+
+    .review-item.wrong-item {
+      border-left: 4px solid var(--danger);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <span class="brand-badge">APU · DGCC</span>
+        <div>
+          <span class="brand-title" id="ui-app-title">Digital Communication & Collaboration</span>
+          <span class="brand-subtitle" id="ui-app-subtitle">Complete Master Quiz (Weeks 1–8 · All 139 Slides & Moodle Lessons)</span>
+        </div>
+      </div>
+
+      <div class="topbar-controls">
+        <div class="lang-switch" role="group" aria-label="Language Switcher">
+          <button type="button" class="lang-btn active" id="btn-lang-en" onclick="setLanguage('en')">EN 🇬🇧</button>
+          <button type="button" class="lang-btn" id="btn-lang-ru" onclick="setLanguage('ru')">RU 🇷🇺</button>
+        </div>
+        <button type="button" class="btn hidden" id="btn-back-setup" onclick="returnToSetup()">
+          ⚙️ <span id="ui-btn-setup">Topic Selection</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- SETUP SCREEN -->
+    <section id="screen-setup" class="card">
+      <div class="section-header">
+        <div>
+          <h1 class="section-title" id="ui-select-topics-title">1. Select Topics to Practice / Test</h1>
+          <p class="section-desc" id="ui-select-topics-desc">
+            Every single Moodle question, slide concept, framework, case study, and micro-detail is included. Questions are freshly shuffled every time.
+          </p>
+        </div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <button type="button" class="btn" onclick="selectAllTopics(true)" id="ui-btn-select-all">Select All</button>
+          <button type="button" class="btn" onclick="selectAllTopics(false)" id="ui-btn-deselect-all">Clear All</button>
+        </div>
+      </div>
+
+      <!-- Topics Grid -->
+      <div class="topics-grid" id="topics-grid"></div>
+
+      <!-- Quiz Configuration Settings -->
+      <div class="settings-grid">
+        <!-- Source Filter -->
+        <div class="setting-box">
+          <label class="setting-label" for="select-source" id="ui-filter-source-label">Question Source Filter</label>
+          <span class="setting-sub" id="ui-filter-source-sub">Include official Moodle checks, slide details, or everything</span>
+          <select id="select-source" class="select-input" onchange="updateSelectionSummary()">
+            <option value="all" id="ui-opt-source-all">All Questions (Moodle + Slides & Details)</option>
+            <option value="moodle" id="ui-opt-source-moodle">Official Moodle Quizzes & Scenarios Only</option>
+            <option value="slides" id="ui-opt-source-slides">Lecture Slides & Micro-Details Only</option>
+          </select>
+        </div>
+
+        <!-- Quiz Mode -->
+        <div class="setting-box">
+          <label class="setting-label" for="select-mode" id="ui-mode-label">Quiz Mode</label>
+          <span class="setting-sub" id="ui-mode-sub">Instant answer checking & explanation or Exam simulation</span>
+          <select id="select-mode" class="select-input">
+            <option value="practice" id="ui-opt-mode-practice">Practice Mode (Instant Answer + Detailed Explanation)</option>
+            <option value="exam" id="ui-opt-mode-exam">Exam Mode (Results & Full Review at the End)</option>
+          </select>
+        </div>
+
+        <!-- Toggle Option Shuffle -->
+        <div class="setting-box">
+          <div class="toggle-row">
+            <div>
+              <div class="setting-label" id="ui-shuffle-opt-label">Shuffle Answer Options (A, B, C, D)</div>
+              <div class="setting-sub" id="ui-shuffle-opt-sub">Randomize the order of choices inside each question</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="toggle-shuffle-options" checked />
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Launch Bar -->
+      <div class="launch-bar">
+        <div class="selected-summary" id="selection-summary"></div>
+        <button type="button" class="btn btn-primary" onclick="startQuiz()" id="btn-start-quiz">
+          🚀 <span id="ui-btn-start">Start Shuffled Quiz Now</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- ACTIVE QUIZ SCREEN -->
+    <section id="screen-quiz" class="quiz-layout hidden">
+      <!-- Left Column: Active Question -->
+      <div class="card">
+        <div class="progress-bar-wrap">
+          <div class="progress-bar-fill" id="quiz-progress-bar" style="width: 0%;"></div>
+        </div>
+
+        <div class="question-meta">
+          <div class="meta-badges">
+            <span class="topic-badge" id="q-topic-badge">W1&2</span>
+            <span class="pill" id="q-source-badge">Slide 10</span>
+          </div>
+          <span class="q-counter" id="q-counter-text">Question 1 / 100</span>
+        </div>
+
+        <h2 class="question-text" id="q-title-text"></h2>
+
+        <div class="options-list" id="q-options-list"></div>
+
+        <!-- Explanation Container -->
+        <div id="q-explanation-box" class="explanation-box hidden">
+          <div class="explanation-title" id="q-explanation-status"></div>
+          <div class="explanation-text" id="q-explanation-body"></div>
+          <div class="explanation-ref" id="q-explanation-ref"></div>
+        </div>
+
+        <!-- Footer Navigation -->
+        <div class="quiz-nav-footer">
+          <button type="button" class="btn" id="btn-prev-q" onclick="navigateQuestion(-1)">
+            ← <span id="ui-btn-prev">Previous</span>
+          </button>
+
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button type="button" class="btn" onclick="reshuffleAndRestartCurrent()">
+              🔀 <span id="ui-btn-reshuffle">Restart Fresh & Reshuffle</span>
+            </button>
+            <button type="button" class="btn btn-primary" id="btn-next-q" onclick="navigateQuestion(1)">
+              <span id="ui-btn-next">Next</span> →
+            </button>
+            <button type="button" class="btn btn-danger" id="btn-finish-quiz" onclick="finishQuiz()">
+              🏁 <span id="ui-btn-finish">Finish Quiz</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Question Navigator -->
+      <aside class="card">
+        <div class="section-title" style="font-size: 1.05rem; margin-bottom: 10px;" id="ui-navigator-title">
+          Question Navigator
+        </div>
+        <div class="score-mini" id="live-score-mini"></div>
+        <div class="q-map-grid" id="q-map-grid"></div>
+      </aside>
+    </section>
+
+    <!-- RESULTS SCREEN -->
+    <section id="screen-results" class="card hidden">
+      <div class="results-hero">
+        <h2 class="section-title" id="ui-results-title">Quiz Results & Complete Breakdown</h2>
+        <div class="results-score-big" id="results-score-big">0 / 0 (0%)</div>
+        <p class="section-desc" id="results-summary-text"></p>
+        <div style="margin-top: 20px; display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+          <button type="button" class="btn btn-primary" onclick="reshuffleAndRestartCurrent()">
+            🔀 <span id="ui-btn-restart-fresh">Start Fresh (Reshuffle All)</span>
+          </button>
+          <button type="button" class="btn" onclick="returnToSetup()">
+            ⚙️ <span id="ui-btn-change-topics">Change Topics</span>
+          </button>
+        </div>
+      </div>
+
+      <h3 class="section-title" style="margin-bottom: 16px;" id="ui-review-heading">Detailed Review of All Questions</h3>
+      <div class="review-list" id="results-review-list"></div>
+    </section>
+  </main>
+
+  <!-- Load Question Databases (Files 2 and 3) -->
+  <script src="questions_part1.js"></script>
+  <script src="questions_part2.js"></script>
+
+  <!-- Main Quiz Application Engine -->
+  <script>
+    // Global Question Arrays populated by questions_part1.js and questions_part2.js
+    window.DGCC_QUESTIONS_PART1 = window.DGCC_QUESTIONS_PART1 || [];
+    window.DGCC_QUESTIONS_PART2 = window.DGCC_QUESTIONS_PART2 || [];
+
+    function getAllQuestions() {
+      return [...window.DGCC_QUESTIONS_PART1, ...window.DGCC_QUESTIONS_PART2];
+    }
+
+    // Topic Metadata (Bilingual)
+    const TOPICS_META = [
+      {
+        id: "W1_2",
+        code: "W1 & W2 · Lecture 1",
+        title: {
+          en: "Introduction to Communication",
+          ru: "Введение в коммуникацию (W1 & W2)"
+        },
+        desc: {
+          en: "Shannon-Weaver model, 8 elements, Interpersonal vs Intrapersonal, Verbal vs 6 Non-Verbal types, Formal vs Informal, Effective vs Ineffective table, TikTok & Sell the Useless.",
+          ru: "Модель Шеннона–Уивера, 8 элементов, межличностная и внутриличностная, 6 типов невербалики, формальная и неформальная, таблица эффективности, TikTok и Sell the Useless."
+        }
+      },
+      {
+        id: "W3",
+        code: "W3 · Lecture 2",
+        title: {
+          en: "Digital Etiquette & Workplace Professionalism",
+          ru: "Цифровой этикет и профессионализм (W3)"
+        },
+        desc: {
+          en: "THINK checklist, Messaging & Forum Do/Don't, 4 Email parts (Dr. Lee & Amir), Digital Footprint, Personal vs Corporate brand, 4 Digital Ethics principles, AI Golden Rule (ASK-EDIT-CHECK), 7 Golden Rules.",
+          ru: "Чек-лист THINK, правила чатов и форумов, 4 части Email, цифровой след, личный и корпоративный бренд, 4 принципа этики, золотое правило ИИ (ASK-EDIT-CHECK), 7 золотых правил."
+        }
+      },
+      {
+        id: "W4",
+        code: "W4 · Lecture 3",
+        title: {
+          en: "Overcoming Barriers in the Digital Workplace",
+          ru: "Преодоление цифровых барьеров (W4)"
+        },
+        desc: {
+          en: "Technical, Language & Cognitive barriers, CHECK-BACK UP-SIGNAL-RESUME, PLAIN-CHECK-SUPPORT-INCLUDE, 3-min task switch, 50-min Focus Sprint, CLEAR-POLITE-RE-READ-CONFIRM, PAUSE-CLARIFY-RESTATE-SWITCH, Cases 1–4.",
+          ru: "Технические, языковые и когнитивные барьеры, планы восстановления, переключение каждые 3 мин, 50-минутный Focus Sprint, деэскалация конфликтов в тексте и Кейсы 1–4."
+        }
+      },
+      {
+        id: "W5",
+        code: "W5 · Lecture 4",
+        title: {
+          en: "Workplace Collaboration, Teamwork & Online Leadership",
+          ru: "Коллаборация, динамика команды и онлайн-лидерство (W5)"
+        },
+        desc: {
+          en: "Face-to-Face/Hybrid/Remote, Hybrid Team (Aisha, Daniel, Maya, Jason), Online-First Rule, Tuckman's 5 stages, 5 Digital Listening habits, Empathy, SBI Formula, Groupthink, 2x2 Conflict Matrix, 6 Leader traits.",
+          ru: "Гибридная команда (Aisha, Daniel, Maya, Jason), правило Online-First, 5 стадий Такмана, 5 привычек активного слушания, формула SBI, Groupthink, матрица конфликтов 2×2, 6 качеств лидера."
+        }
+      },
+      {
+        id: "W6",
+        code: "W6 · Lecture 5",
+        title: {
+          en: "Intercultural Communication in Global Teams",
+          ru: "Межкультурная коммуникация в глобальных командах (W6)"
+        },
+        desc: {
+          en: "3 Layers of Culture, Marshall McLuhan medium theory, High-Context vs Low-Context, Reply Hack, Cultural Intelligence (CQ) loop, Stereotype-Hypothesis-Question, 7-Second Inclusion Check, Before/During/After meeting.",
+          ru: "3 слоя культуры, теория канала Маклюэна, высоко- и низкоконтекстная культура, Reply Hack, цикл CQ, Стереотип–Гипотеза–Вопрос, 7-секундная проверка инклюзивности, митинги До/Во время/После."
+        }
+      },
+      {
+        id: "W7",
+        code: "W7 · Lecture 6",
+        title: {
+          en: "Virtual Presentations & Audience Engagement",
+          ru: "Виртуальные презентации и удержание внимания (W7)"
+        },
+        desc: {
+          en: "CAMERA-LIGHT-FRAME-EYES, Micro-Move, 3V Digital Mixer (Voice, Visuals, Presence), NPC vs Main Character, Attention Heartbeat, ASK-INVOLVE-RELATE-RESET, Fatigue/Void/Slump, P.A.U.S.E. method, Headline Poster.",
+          ru: "Настройка кадра (CAMERA-LIGHT-FRAME-EYES), микшер 3Vs, NPC против Main Character, пульс внимания, формула ASK-INVOLVE-RELATE-RESET, метод P.A.U.S.E. для Q&A и челлендж Headline Poster."
+        }
+      },
+      {
+        id: "W8",
+        code: "W8 · Lecture 7",
+        title: {
+          en: "Visual Business Communication & Data Visualisation",
+          ru: "Визуальная бизнес-коммуникация и данные (W8)"
+        },
+        desc: {
+          en: "Visual-Professional-Clear rule, Visual Hierarchy, Whitespace & Typography, Contrast, Virtual Pitch vs Corporate Update, 5 Data Rules, Bar/Pie/Line/Infographic toolkit, AI tools & 4 Human Checkpoints.",
+          ru: "Правило Visual-Professional-Clear, визуальная иерархия, воздух и типографика, контраст, питч против корп. отчета, 5 правил данных, 4 типа графиков, ИИ-инструменты и 4 проверки человеком."
+        }
+      }
+    ];
+
+    // UI Translations Dictionary
+    const UI_TEXT = {
+      en: {
+        appTitle: "Digital Communication & Collaboration",
+        appSubtitle: "Complete Master Quiz (Weeks 1–8 · All 139 Slides & Moodle Lessons)",
+        btnSetup: "Topic Selection",
+        selectTopicsTitle: "1. Select Topics to Practice / Test",
+        selectTopicsDesc: "Every single Moodle question, slide concept, framework, case study, and micro-detail is included. Questions are freshly shuffled every time.",
+        btnSelectAll: "Select All Topics",
+        btnDeselectAll: "Clear Selection",
+        filterSourceLabel: "Question Source Filter",
+        filterSourceSub: "Include official Moodle checks, slide details, or everything",
+        optSourceAll: "All Questions (Moodle + Slides & Details)",
+        optSourceMoodle: "Official Moodle Quizzes & Scenarios Only",
+        optSourceSlides: "Lecture Slides & Micro-Details Only",
+        modeLabel: "Quiz Mode",
+        modeSub: "Instant answer checking & explanation or Exam simulation",
+        optModePractice: "Practice Mode (Instant Answer + Detailed Explanation)",
+        optModeExam: "Exam Mode (Results & Full Review at the End)",
+        shuffleOptLabel: "Shuffle Answer Options (A, B, C, D)",
+        shuffleOptSub: "Randomize the order of choices inside each question",
+        btnStart: "Start Shuffled Quiz Now",
+        btnPrev: "Previous",
+        btnNext: "Next",
+        btnReshuffle: "Restart Fresh & Reshuffle",
+        btnFinish: "Finish Quiz",
+        navigatorTitle: "Question Navigator",
+        resultsTitle: "Quiz Results & Complete Breakdown",
+        btnRestartFresh: "Start Fresh (Reshuffle All)",
+        btnChangeTopics: "Change Topics",
+        reviewHeading: "Detailed Review of All Questions",
+        moodleBadge: "Moodle Official",
+        slidesBadge: "Slides & Details",
+        totalBadge: "Total",
+        questionWord: "Question",
+        ofWord: "of",
+        correctMsg: "✔ Correct Answer!",
+        wrongMsg: "✖ Incorrect Answer",
+        unansweredMsg: "Not Answered",
+        yourAnswer: "Your answer",
+        correctAnswer: "Correct answer",
+        sourceLabel: "Source",
+        answeredLabel: "Answered",
+        scoreLabel: "Current Score",
+        noTopicsAlert: "Please select at least one topic with available questions!",
+        summaryTemplate: (topicsCount, qCount) =>
+          `Selected <strong>${topicsCount}</strong> topic(s) · <strong>${qCount}</strong> questions ready to shuffle`
+      },
+      ru: {
+        appTitle: "Цифровая коммуникация и коллаборация (DGCC)",
+        appSubtitle: "Полный мастер-тестовик (Недели 1–8 · Все 139 слайдов и уроки Moodle)",
+        btnSetup: "Выбор топиков",
+        selectTopicsTitle: "1. Выбери темы для тренировки / теста",
+        selectTopicsDesc: "Включены абсолютно все вопросы из Moodle, каждый слайд, схема, кейс и мелкая деталь. При каждом старте вопросы перемешиваются заново.",
+        btnSelectAll: "Выбрать все темы",
+        btnDeselectAll: "Сбросить выбор",
+        filterSourceLabel: "Фильтр источника вопросов",
+        filterSourceSub: "Все вопросы сразу, только тесты из Moodle или только детали со слайдов",
+        optSourceAll: "Все вопросы (Moodle + Слайды и детали)",
+        optSourceMoodle: "Только официальные тесты и кейсы из Moodle",
+        optSourceSlides: "Только слайды презентаций и микро-детали",
+        modeLabel: "Режим прохождения",
+        modeSub: "Мгновенная проверка с объяснением или режим экзамена",
+        optModePractice: "Режим практики (Сразу ответ + подробный разбор)",
+        optModeExam: "Режим экзамена (Результаты и разбор в конце)",
+        shuffleOptLabel: "Перемешивать варианты ответов (A, B, C, D)",
+        shuffleOptSub: "Случайный порядок кнопок ответов внутри каждого вопроса",
+        btnStart: "Запустить рандомный тест",
+        btnPrev: "Назад",
+        btnNext: "Далее",
+        btnReshuffle: "Начать заново и перемешать",
+        btnFinish: "Завершить тест",
+        navigatorTitle: "Навигатор по вопросам",
+        resultsTitle: "Результаты теста и полный разбор",
+        btnRestartFresh: "Начать заново (перемешать всё)",
+        btnChangeTopics: "Изменить выбор тем",
+        reviewHeading: "Подробный разбор всех вопросов",
+        moodleBadge: "Moodle тест",
+        slidesBadge: "Слайды и детали",
+        totalBadge: "Всего",
+        questionWord: "Вопрос",
+        ofWord: "из",
+        correctMsg: "✔ Верный ответ!",
+        wrongMsg: "✖ Неверный ответ",
+        unansweredMsg: "Без ответа",
+        yourAnswer: "Твой ответ",
+        correctAnswer: "Правильный ответ",
+        sourceLabel: "Источник",
+        answeredLabel: "Отвечено",
+        scoreLabel: "Текущий счет",
+        noTopicsAlert: "Пожалуйста, выбери хотя бы один топик с вопросами!",
+        summaryTemplate: (topicsCount, qCount) =>
+          `Выбрано топиков: <strong>${topicsCount}</strong> · Готово к рандому вопросов: <strong>${qCount}</strong>`
+      }
+    };
+
+    // Application State (No localStorage — always fresh!)
+    let state = {
+      lang: "en",
+      selectedTopics: new Set(["W1_2", "W3", "W4", "W5", "W6", "W7", "W8"]),
+      sourceFilter: "all",
+      mode: "practice",
+      shuffleOptions: true,
+      screen: "setup", // "setup" | "quiz" | "results"
+      quizQuestions: [], // Array of { rawQuestion, optionOrder: [0,1,2,3], selectedOriginalIdx: null | number }
+      currentIndex: 0
+    };
+
+    // Unbiased Fisher–Yates Shuffle Algorithm
+    function fisherYatesShuffle(arr) {
+      const copy = [...arr];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    // Switch Language (EN / RU) dynamically on any screen
+    function setLanguage(lang) {
+      state.lang = lang;
+      document.getElementById("btn-lang-en").classList.toggle("active", lang === "en");
+      document.getElementById("btn-lang-ru").classList.toggle("active", lang === "ru");
+      document.documentElement.lang = lang;
+      applyStaticTranslations();
+      renderTopicsGrid();
+      updateSelectionSummary();
+
+      if (state.screen === "quiz") {
+        renderCurrentQuestion();
+        renderQuestionNavigator();
+      } else if (state.screen === "results") {
+        renderResultsScreen();
+      }
+    }
+
+    function applyStaticTranslations() {
+      const t = UI_TEXT[state.lang];
+      document.getElementById("ui-app-title").textContent = t.appTitle;
+      document.getElementById("ui-app-subtitle").textContent = t.appSubtitle;
+      document.getElementById("ui-btn-setup").textContent = t.btnSetup;
+      document.getElementById("ui-select-topics-title").textContent = t.selectTopicsTitle;
+      document.getElementById("ui-select-topics-desc").textContent = t.selectTopicsDesc;
+      document.getElementById("ui-btn-select-all").textContent = t.btnSelectAll;
+      document.getElementById("ui-btn-deselect-all").textContent = t.btnDeselectAll;
+      document.getElementById("ui-filter-source-label").textContent = t.filterSourceLabel;
+      document.getElementById("ui-filter-source-sub").textContent = t.filterSourceSub;
+      document.getElementById("ui-opt-source-all").textContent = t.optSourceAll;
+      document.getElementById("ui-opt-source-moodle").textContent = t.optSourceMoodle;
+      document.getElementById("ui-opt-source-slides").textContent = t.optSourceSlides;
+      document.getElementById("ui-mode-label").textContent = t.modeLabel;
+      document.getElementById("ui-mode-sub").textContent = t.modeSub;
+      document.getElementById("ui-opt-mode-practice").textContent = t.optModePractice;
+      document.getElementById("ui-opt-mode-exam").textContent = t.optModeExam;
+      document.getElementById("ui-shuffle-opt-label").textContent = t.shuffleOptLabel;
+      document.getElementById("ui-shuffle-opt-sub").textContent = t.shuffleOptSub;
+      document.getElementById("ui-btn-start").textContent = t.btnStart;
+      document.getElementById("ui-btn-prev").textContent = t.btnPrev;
+      document.getElementById("ui-btn-next").textContent = t.btnNext;
+      document.getElementById("ui-btn-reshuffle").textContent = t.btnReshuffle;
+      document.getElementById("ui-btn-finish").textContent = t.btnFinish;
+      document.getElementById("ui-navigator-title").textContent = t.navigatorTitle;
+      document.getElementById("ui-results-title").textContent = t.resultsTitle;
+      document.getElementById("ui-btn-restart-fresh").textContent = t.btnRestartFresh;
+      document.getElementById("ui-btn-change-topics").textContent = t.btnChangeTopics;
+      document.getElementById("ui-review-heading").textContent = t.reviewHeading;
+    }
+
+    // Render Topic Cards on Setup Screen
+    function renderTopicsGrid() {
+      const grid = document.getElementById("topics-grid");
+      const allQ = getAllQuestions();
+      const t = UI_TEXT[state.lang];
+
+      grid.innerHTML = TOPICS_META.map(topic => {
+        const isSelected = state.selectedTopics.has(topic.id);
+        const topicQuestions = allQ.filter(q => q.topic === topic.id);
+        const moodleCount = topicQuestions.filter(q => q.sourceType === "moodle").length;
+        const slidesCount = topicQuestions.filter(q => q.sourceType === "slides").length;
+
+        return `
+          <div class="topic-card ${isSelected ? "selected" : ""}" onclick="toggleTopic('${topic.id}')">
+            <div>
+              <div class="topic-top">
+                <span class="topic-badge">${topic.code}</span>
+                <span class="topic-check">✓</span>
+              </div>
+              <div class="topic-name" style="margin-top: 10px;">${topic.title[state.lang]}</div>
+              <div class="topic-details" style="margin-top: 6px;">${topic.desc[state.lang]}</div>
+            </div>
+            <div class="topic-stats">
+              <span class="pill">${t.totalBadge}: ${topicQuestions.length}</span>
+              <span class="pill pill-moodle">${t.moodleBadge}: ${moodleCount}</span>
+              <span class="pill pill-slides">${t.slidesBadge}: ${slidesCount}</span>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function toggleTopic(topicId) {
+      if (state.selectedTopics.has(topicId)) {
+        state.selectedTopics.delete(topicId);
+      } else {
+        state.selectedTopics.add(topicId);
+      }
+      renderTopicsGrid();
+      updateSelectionSummary();
+    }
+
+    function selectAllTopics(selectAll) {
+      if (selectAll) {
+        TOPICS_META.forEach(t => state.selectedTopics.add(t.id));
+      } else {
+        state.selectedTopics.clear();
+      }
+      renderTopicsGrid();
+      updateSelectionSummary();
+    }
+
+    function getFilteredQuestionsPool() {
+      const sourceFilter = document.getElementById("select-source").value;
+      return getAllQuestions().filter(q => {
+        const topicMatch = state.selectedTopics.has(q.topic);
+        const sourceMatch = sourceFilter === "all" || q.sourceType === sourceFilter;
+        return topicMatch && sourceMatch;
+      });
+    }
+
+    function updateSelectionSummary() {
+      const pool = getFilteredQuestionsPool();
+      const t = UI_TEXT[state.lang];
+      document.getElementById("selection-summary").innerHTML = t.summaryTemplate(
+        state.selectedTopics.size,
+        pool.length
+      );
+    }
+
+    // Start or Restart Quiz with Fresh Fisher-Yates Shuffle
+    function startQuiz() {
+      const pool = getFilteredQuestionsPool();
+      const t = UI_TEXT[state.lang];
+
+      if (pool.length === 0) {
+        alert(t.noTopicsAlert);
+        return;
+      }
+
+      state.sourceFilter = document.getElementById("select-source").value;
+      state.mode = document.getElementById("select-mode").value;
+      state.shuffleOptions = document.getElementById("toggle-shuffle-options").checked;
+
+      const shuffledPool = fisherYatesShuffle(pool);
+
+      state.quizQuestions = shuffledPool.map(rawQ => {
+        const indices = rawQ.options.map((_, idx) => idx);
+        const optionOrder = state.shuffleOptions ? fisherYatesShuffle(indices) : indices;
+        return {
+          raw: rawQ,
+          optionOrder,
+          selectedOriginalIdx: null
+        };
+      });
+
+      state.currentIndex = 0;
+      state.screen = "quiz";
+
+      document.getElementById("screen-setup").classList.add("hidden");
+      document.getElementById("screen-results").classList.add("hidden");
+      document.getElementById("screen-quiz").classList.remove("hidden");
+      document.getElementById("btn-back-setup").classList.remove("hidden");
+
+      renderCurrentQuestion();
+      renderQuestionNavigator();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function reshuffleAndRestartCurrent() {
+      startQuiz();
+    }
+
+    function returnToSetup() {
+      state.screen = "setup";
+      document.getElementById("screen-quiz").classList.add("hidden");
+      document.getElementById("screen-results").classList.add("hidden");
+      document.getElementById("btn-back-setup").classList.add("hidden");
+      document.getElementById("screen-setup").classList.remove("hidden");
+      renderTopicsGrid();
+      updateSelectionSummary();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    // Render Active Question
+    function renderCurrentQuestion() {
+      const t = UI_TEXT[state.lang];
+      const item = state.quizQuestions[state.currentIndex];
+      const q = item.raw;
+      const total = state.quizQuestions.length;
+
+      // Progress bar
+      const pct = ((state.currentIndex + 1) / total) * 100;
+      document.getElementById("quiz-progress-bar").style.width = `${pct}%`;
+
+      // Badges & Counter
+      const topicMeta = TOPICS_META.find(m => m.id === q.topic);
+      document.getElementById("q-topic-badge").textContent = topicMeta ? topicMeta.code : q.topic;
+
+      const sourceBadge = document.getElementById("q-source-badge");
+      sourceBadge.textContent = q.sourceRef[state.lang];
+      sourceBadge.className = `pill ${q.sourceType === "moodle" ? "pill-moodle" : "pill-slides"}`;
+
+      document.getElementById("q-counter-text").textContent =
+        `${t.questionWord} ${state.currentIndex + 1} ${t.ofWord} ${total}`;
+
+      // Question Title
+      document.getElementById("q-title-text").textContent = q.q[state.lang];
+
+      // Options
+      const letters = ["A", "B", "C", "D", "E", "F"];
+      const hasAnswered = item.selectedOriginalIdx !== null;
+      const isPractice = state.mode === "practice";
+
+      const optionsHtml = item.optionOrder.map((origIdx, displayPos) => {
+        const optText = q.options[origIdx][state.lang];
+        const letter = letters[displayPos] || String(displayPos + 1);
+        let btnClass = "option-btn";
+
+        if (hasAnswered) {
+          if (isPractice) {
+            if (origIdx === q.correct) {
+              btnClass += " correct";
+            } else if (origIdx === item.selectedOriginalIdx) {
+              btnClass += " wrong";
+            }
+          } else if (origIdx === item.selectedOriginalIdx) {
+            btnClass += " selected";
+          }
+        }
+
+        const disabledAttr = (isPractice && hasAnswered) ? "disabled" : "";
+
+        return `
+          <button type="button" class="${btnClass}" ${disabledAttr} onclick="selectOption(${origIdx})">
+            <span class="option-letter">${letter}</span>
+            <span>${optText}</span>
+          </button>
+        `;
+      }).join("");
+
+      document.getElementById("q-options-list").innerHTML = optionsHtml;
+
+      // Explanation Box (Shown immediately in Practice Mode after answering)
+      const expBox = document.getElementById("q-explanation-box");
+      if (isPractice && hasAnswered) {
+        const isCorrect = item.selectedOriginalIdx === q.correct;
+        expBox.className = `explanation-box ${isCorrect ? "is-correct" : "is-wrong"}`;
+        document.getElementById("q-explanation-status").textContent = isCorrect ? t.correctMsg : t.wrongMsg;
+        document.getElementById("q-explanation-body").textContent = q.explanation[state.lang];
+        document.getElementById("q-explanation-ref").textContent = `${t.sourceLabel}: ${q.sourceRef[state.lang]}`;
+      } else {
+        expBox.className = "explanation-box hidden";
+      }
+
+      // Footer Buttons
+      document.getElementById("btn-prev-q").disabled = state.currentIndex === 0;
+      document.getElementById("btn-next-q").disabled = state.currentIndex === total - 1;
+    }
+
+    function selectOption(origIdx) {
+      const item = state.quizQuestions[state.currentIndex];
+      if (state.mode === "practice" && item.selectedOriginalIdx !== null) {
+        return; // Already locked in practice mode
+      }
+      item.selectedOriginalIdx = origIdx;
+      renderCurrentQuestion();
+      renderQuestionNavigator();
+    }
+
+    function navigateQuestion(delta) {
+      const nextIdx = state.currentIndex + delta;
+      if (nextIdx >= 0 && nextIdx < state.quizQuestions.length) {
+        state.currentIndex = nextIdx;
+        renderCurrentQuestion();
+        renderQuestionNavigator();
+      }
+    }
+
+    function jumpToQuestion(idx) {
+      state.currentIndex = idx;
+      renderCurrentQuestion();
+      renderQuestionNavigator();
+    }
+
+    function renderQuestionNavigator() {
+      const t = UI_TEXT[state.lang];
+      const total = state.quizQuestions.length;
+      const answeredCount = state.quizQuestions.filter(i => i.selectedOriginalIdx !== null).length;
+      const correctCount = state.quizQuestions.filter(i => i.selectedOriginalIdx === i.raw.correct).length;
+
+      const scoreMini = document.getElementById("live-score-mini");
+      if (state.mode === "practice") {
+        scoreMini.innerHTML = `
+          <span>${t.answeredLabel}: <strong>${answeredCount}/${total}</strong></span>
+          <span>${t.scoreLabel}: <strong>${correctCount}/${answeredCount}</strong></span>
+        `;
+      } else {
+        scoreMini.innerHTML = `
+          <span>${t.answeredLabel}: <strong>${answeredCount}/${total}</strong></span>
+        `;
+      }
+
+      const mapGrid = document.getElementById("q-map-grid");
+      mapGrid.innerHTML = state.quizQuestions.map((item, idx) => {
+        let cls = "q-map-btn";
+        if (idx === state.currentIndex) cls += " current";
+        if (item.selectedOriginalIdx !== null) {
+          if (state.mode === "practice") {
+            cls += item.selectedOriginalIdx === item.raw.correct ? " answered-correct" : " answered-wrong";
+          } else {
+            cls += " answered-exam";
+          }
+        }
+        return `<button type="button" class="${cls}" onclick="jumpToQuestion(${idx})">${idx + 1}</button>`;
+      }).join("");
+    }
+
+    // Finish Quiz & Show Full Bilingual Breakdown
+    function finishQuiz() {
+      state.screen = "results";
+      document.getElementById("screen-quiz").classList.add("hidden");
+      document.getElementById("screen-results").classList.remove("hidden");
+      renderResultsScreen();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function renderResultsScreen() {
+      const t = UI_TEXT[state.lang];
+      const total = state.quizQuestions.length;
+      const correctCount = state.quizQuestions.filter(i => i.selectedOriginalIdx === i.raw.correct).length;
+      const pct = total > 0 ? Math.round((correctCount / total) * 100) : 0;
+
+      document.getElementById("results-score-big").textContent = `${correctCount} / ${total} (${pct}%)`;
+      document.getElementById("results-summary-text").textContent =
+        `${t.answeredLabel}: ${state.quizQuestions.filter(i => i.selectedOriginalIdx !== null).length} / ${total}`;
+
+      const reviewList = document.getElementById("results-review-list");
+      reviewList.innerHTML = state.quizQuestions.map((item, idx) => {
+        const q = item.raw;
+        const isCorrect = item.selectedOriginalIdx === q.correct;
+        const userAnsText = item.selectedOriginalIdx !== null
+          ? q.options[item.selectedOriginalIdx][state.lang]
+          : t.unansweredMsg;
+        const correctAnsText = q.options[q.correct][state.lang];
+
+        return `
+          <div class="review-item ${isCorrect ? "correct-item" : "wrong-item"}">
+            <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:8px;">
+              <span class="topic-badge">${q.topic} · #${idx + 1}</span>
+              <span class="pill">${q.sourceRef[state.lang]}</span>
+            </div>
+            <div style="font-weight:700; font-size:1.05rem; margin-bottom:10px;">
+              ${q.q[state.lang]}
+            </div>
+            <div style="font-size:0.93rem; margin-bottom:4px; color:${isCorrect ? "#86efac" : "#fca5a5"};">
+              <strong>${t.yourAnswer}:</strong> ${userAnsText} ${isCorrect ? "✔" : "✖"}
+            </div>
+            ${!isCorrect ? `
+              <div style="font-size:0.93rem; margin-bottom:8px; color:#86efac;">
+                <strong>${t.correctAnswer}:</strong> ${correctAnsText}
+              </div>
+            ` : ""}
+            <div style="font-size:0.9rem; color:var(--text-secondary); margin-top:8px; padding-top:8px; border-top:1px solid var(--border);">
+              ${q.explanation[state.lang]}
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    // Initialize on DOM load
+    window.addEventListener("DOMContentLoaded", () => {
+      applyStaticTranslations();
+      renderTopicsGrid();
+      updateSelectionSummary();
+    });
+  </script>
+</body>
+</html>
